@@ -1,0 +1,53 @@
+静态分析vmp的话,内部分支(vJcc,vmexit)是很麻烦的一件事,因为不知道他要跳转的下一个basic block在哪。
+
+
+```
+  0x14FE90[rbp+0]=0x98110D60 key1
+          [rbp+8]=5FA3C0     key2
+PUSHVSPQ -> push rbp
+          [rbp+0]=0x14FE90
+          [rbp+8]=0x98110D60
+          [rbp+10]=5FA3C0
+READDW    -> read [rbp+0] = read [14FE90] = 0x98110D60
+          [rbp+0]=0x98110D60
+          [rbp+8]=5FA3C0
+NANDDW    -> {(dword)(~[rbp+0]) & [rbp+4]} = 67EEf29f    P(key1,key1)
+          [rbp+0]=0x206
+          [rbp+8]=0x67EEF29F
+          [rbp+10]=5FA3C0
+SREGQ     -> store rflags
+          [rbp+0]=0x67EEF29F
+          [rbp+8]=5FA3C0
+LCONSTDW  0x27ee5642
+          [rbp+0]=67EEF29F27EE5642  (rbp == 14FE8C)
+          [rbp+8]=005FA3C000000000
+
+NANDDW    {(dword)(~[rbp+0]) & [rbp+4]} =  98110920
+SREGQ     ->store rflags
+LCONSTDW 0xd811a9bd 
+LREGDW   
+NANDDW
+SREGQ
+NANDDW
+SREGQ
+SREGQ
+
+
+new rsi = [rbp+0]^0xd811a9bd
+
+
+```
+
+
+
+
+https://www.bbsmax.com/A/kPzO2rPZdx/
+https://back.engineering/21/06/2021/#vtil-vmprofiler-lifting
+
+
+
+
+
+
+
+
